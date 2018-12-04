@@ -65,7 +65,7 @@ constexpr std::size_t default_output_buffer_size = 1 << 20;
 
 namespace circlecover {
 	namespace rectangle_size_bound {
-		void __host__ find_critical_intervals(unsigned start_from_lambda_offset);
+		void __host__ find_critical_intervals();
 
 		struct Interval_buffer {
 			__host__ Interval_buffer() :
@@ -309,7 +309,7 @@ void __host__ circlecover::rectangle_size_bound::find_critical_intervals_in(cons
 	}
 }
 
-void __host__ circlecover::rectangle_size_bound::find_critical_intervals(unsigned start_from_lambda_offset) {
+void __host__ circlecover::rectangle_size_bound::find_critical_intervals() {
 	output_begin_case("Critical intervals for rectangles with small disks");
 	std::cout << "Size bound: r <= " << ub_disk_radius << ", critical ratio: " << critical_ratio << std::endl;
 	std::cerr << "Size bound: r <= " << ub_disk_radius << ", critical ratio: " << critical_ratio << std::endl;
@@ -323,7 +323,7 @@ void __host__ circlecover::rectangle_size_bound::find_critical_intervals(unsigne
 	std::vector<Variables> current_gen, next_gen;
 
 	std::cerr << "Initializing..." << std::endl;
-	find_critical_intervals_in(initial, buffer, next_gen, false, true, start_from_lambda_offset);
+	find_critical_intervals_in(initial, buffer, next_gen, false, true);
 	current_gen = merge_critical_intervals<0>(next_gen);
 	next_gen.clear();
 
