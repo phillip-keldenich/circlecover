@@ -205,6 +205,47 @@ static inline bool __device__ three_disk_recursion_r1_r3_pocket(IV la, IV r1, IV
 	return can_recurse(x, y, ub_r4, lb_R4);
 }
 
+static inline bool __device__ manually_proved_three_disk_pocket(IV la, IV r1, IV r2, IV r3) {
+	if(la.get_ub() > 1.0499999999999998) {
+		return false;
+	}
+	IV lasq = square(la);
+	// the weight of a disk at the three-disk worst-case
+	IV rstar = 0.0625 * lasq + 0.15625 + 0.03515625 / lasq;
+	// check if we are fully in the manually-proved range
+	IV d1 = rstar - r1;
+	if(d1.get_lb() < -0.0009999999999999998 || d1.get_ub() > 0.0009999999999999998) {
+		return false;
+	}
+	IV d2 = rstar - r2;
+	if(d2.get_lb() < -0.0019999999999999996 || d2.get_ub() > 0.0019999999999999996) {
+		return false;
+	}
+	IV d3 = rstar - r3;
+	if(d3.get_lb() < -0.0029999999999999996 || d3.get_ub() > 0.0029999999999999996) {
+		return false;
+	}
+	// compute X = lambda - S1 - S3
+	IV S1 = 2.0 * sqrt(r1 - 0.25);
+	IV la_m_S1 = la - S1;
+	IV h2_rest = 0.25*la_m_S1*la_m_S1;
+	if(r2.get_lb() <= h2_rest.get_ub()) {
+		return false;
+	}
+	IV h2 = 2.0 * sqrt(r2 - h2_rest);
+	IV v1_m_h2 = 1.0 - h2;
+	IV S3_rest = 0.25*v1_m_h2*v1_m_h2;
+	if(r3.get_lb() <= S3_rest.get_ub()) {
+		return false;
+	}
+	IV S3 = 2.0 * sqrt(r3 - S3_rest);
+	IV X = la - S1 - S3;
+	if(X.get_ub() > 0.046999999999999993) {
+		return false;
+	}
+	return true;
+}
+
 bool __device__ circlecover::tight_rectangle::r1_r2_r3_strategies(const Variables& vars, IV R4) {
 	const double ub_la = vars.la.get_ub();
 	const double r1 = vars.radii[0].get_lb();
@@ -214,6 +255,7 @@ bool __device__ circlecover::tight_rectangle::r1_r2_r3_strategies(const Variable
 	const double lb_R4 = R4.get_lb();
 	return three_disk_recursion_big_strip(ub_la, r1, r2, r3, ub_r4, lb_R4) || 
 		three_disk_recursion_small_corner(ub_la, r1, r2, r3, ub_r4, lb_R4) ||
-		three_disk_recursion_r1_r3_pocket(vars.la, vars.radii[0], vars.radii[1], vars.radii[2], ub_r4, lb_R4);
+		three_disk_recursion_r1_r3_pocket(vars.la, vars.radii[0], vars.radii[1], vars.radii[2], ub_r4, lb_R4) ||
+		manually_proved_three_disk_pocket(vars.la, vars.radii[0], vars.radii[1], vars.radii[2]);
 }
 

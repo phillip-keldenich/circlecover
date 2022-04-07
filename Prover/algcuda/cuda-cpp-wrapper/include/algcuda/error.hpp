@@ -100,3 +100,4 @@ namespace algcuda {
 #define ALGCUDA_THROW_IF_ERROR(expr, msg) ::algcuda::throw_if_cuda_error((expr), msg, __FILE__, __LINE__)
 
 }
+

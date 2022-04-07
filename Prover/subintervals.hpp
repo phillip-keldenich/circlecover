@@ -26,7 +26,8 @@
 #include <algcuda/interval.hpp>
 
 namespace circlecover {
-	// get the ith (almost) equal-width subinterval of n subintervals of the given interval; a full cover of the entire interval is guaranteed
+	// get the ith (almost) equal-width subinterval of n subintervals of the given interval;
+	// a full cover of the entire interval is guaranteed
 	// intervals [0,n) are valid
 	template<typename NumType>
 	inline algcuda::Interval<NumType> __device__ __host__ get_subinterval(algcuda::Interval<NumType> interval, int i, int n) {

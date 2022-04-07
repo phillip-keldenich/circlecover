@@ -36,3 +36,4 @@ namespace algcuda {
 }
 
 #endif //ALGCUDA_DEVICE_HPP
+

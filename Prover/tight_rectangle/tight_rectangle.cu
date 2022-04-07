@@ -243,7 +243,10 @@ static __global__ void kernel_find_critical_intervals_in(Variables intervals, Va
 						continue;
 					}
 
-					if(!two_by_two_strategies(vars, R) && !r1_r2_r3_strategies(vars, R4) && !r1_r2_large_r3_r4_gaps_strategy(vars, R)) {
+					if(!two_by_two_strategies(vars, R) && 
+					   !r1_r2_r3_strategies(vars, R4) &&
+					   !r1_r2_large_r3_r4_gaps_strategy(vars, R))
+					{
 //						printf("Critical interval: la = [%.17g,%.17g], r1 = [%.17g,%.17g], r2 = [%.17g,%.17g], r3 = [%.17g,%.17g], r4 = [%.17g, %.17g], R = [%.17g, %.17g]\n",
 //							vars.la.get_lb(), vars.la.get_ub(), vars.radii[0].get_lb(), vars.radii[0].get_ub(), 
 //							vars.radii[1].get_lb(), vars.radii[1].get_ub(), vars.radii[2].get_lb(), vars.radii[2].get_ub(),
