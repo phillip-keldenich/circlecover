@@ -140,7 +140,7 @@ static __device__ const Combination3 combinations3[] = {
 };
 }
 
-__device__ static bool six_disks_can_cover_width_2times3(const Variables& vars, double width) {
+/*__device__ static bool six_disks_can_cover_width_2times3(const Variables& vars, double width) {
 	for(const Combination& c : combinations) {
 		double wfirst  = three_disks_maximize_height( vars.radii[c.first[0]],  vars.radii[c.first[1]],  vars.radii[c.first[2]], 1.0);
 		double wsecond = three_disks_maximize_height(vars.radii[c.second[0]], vars.radii[c.second[1]], vars.radii[c.second[2]], 1.0);
@@ -151,7 +151,7 @@ __device__ static bool six_disks_can_cover_width_2times3(const Variables& vars, 
 	}
 
 	return false;
-}
+}*/
 
 __device__ static double six_disks_maximize_covered_width_2times3(const Variables& vars) {
 	double result = 0.0;
@@ -185,7 +185,7 @@ __device__ static double six_disks_maximize_covered_width_3times2(const Variable
 	return result;
 }
 
-__device__ static bool six_disks_can_cover_width_3times2(const Variables& vars, double width) {
+/*__device__ static bool six_disks_can_cover_width_3times2(const Variables& vars, double width) {
 	for(const Combination3& c : combinations3) {
 		double w1 = two_disks_maximize_height( vars.radii[c.first[0]],  vars.radii[c.first[1]], 1.0);
 		double w2 = two_disks_maximize_height(vars.radii[c.second[0]], vars.radii[c.second[1]], 1.0);
@@ -197,7 +197,7 @@ __device__ static bool six_disks_can_cover_width_3times2(const Variables& vars, 
 	}
 
 	return false;
-}
+}*/
 
 /*__device__ bool circlecover::rectangle_size_bound::six_disks_can_cover_width(const Variables& vars, double width) {
 	return six_disks_can_cover_width_r56_center(vars, width) || six_disks_can_cover_width_2times3(vars, width) || six_disks_can_cover_width_3times2(vars,width);
