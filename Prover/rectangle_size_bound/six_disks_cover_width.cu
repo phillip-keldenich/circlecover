@@ -199,9 +199,9 @@ __device__ static bool six_disks_can_cover_width_3times2(const Variables& vars, 
 	return false;
 }
 
-__device__ bool circlecover::rectangle_size_bound::six_disks_can_cover_width(const Variables& vars, double width) {
+/*__device__ bool circlecover::rectangle_size_bound::six_disks_can_cover_width(const Variables& vars, double width) {
 	return six_disks_can_cover_width_r56_center(vars, width) || six_disks_can_cover_width_2times3(vars, width) || six_disks_can_cover_width_3times2(vars,width);
-}
+}*/
 
 __device__ double  circlecover::rectangle_size_bound::six_disks_maximize_covered_width(const Variables& vars) {
 	double w = six_disks_maximize_covered_width_3times2(vars);

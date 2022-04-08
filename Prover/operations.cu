@@ -28,21 +28,27 @@ namespace circlecover {
 	}
 
 	__device__ Intersection_points intersection(const Circle& c1, const Circle& c2) {
+		// Initialize: We are not sure if there even is an intersection.
 		Intersection_points result;
 		result.definitely_intersecting = false;
 
 		IV sq_dist = squared_distance(c1.center, c2.center);
 		if(sq_dist.get_lb() == 0) {
+			// the points might be the same point; in this case,
+			// we return the most general result (its not sure if there is an intersection).
 			return result;
 		}
 
+		// difference between squared radii and its square
 		IV rdiff = c1.squared_radius - c2.squared_radius;
 		IV rdiff_sq = rdiff.square();
 
 		IV fac1 = 2.0*(c1.squared_radius + c2.squared_radius)/sq_dist - 1.0 - rdiff_sq/sq_dist.square();
 		if(fac1.get_lb() < 0) {
+			// there might not be an intersection
 			return result;
 		}
+		// otherwise, we can take the square root and we definitely have an intersection
 		fac1 = 0.5*sqrt(fac1);
 		result.definitely_intersecting = true;
 
@@ -83,6 +89,7 @@ namespace circlecover {
 	}
 
 	__device__ Point center(const Point& p1, const Point& p2) {
+		// all computation done with intervals
 		return { p1.x + 0.5*(p2.x-p1.x), p1.y + 0.5*(p2.y-p1.y) };
 	}
 }

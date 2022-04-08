@@ -32,6 +32,10 @@ namespace circlecover {
 		static constexpr std::size_t output_width = 120;
 	}
 
+	/**
+	 * @brief A utility method for printing the begin of a case.
+	 * @param message 
+	 */
 	inline void output_begin_case(const char* message) {
 		std::size_t mlen = std::strlen(message);
 		if(mlen >= detail::output_width - 2) {
@@ -48,6 +52,9 @@ namespace circlecover {
 		std::cout << std::endl;
 	}
 
+	/**
+	 * @brief A utility method for printing the end of a case.
+	 */
 	inline void output_end_case() {
 		std::fill_n(std::ostreambuf_iterator<char>(std::cout), detail::output_width, '-');
 		std::cout << std::endl;

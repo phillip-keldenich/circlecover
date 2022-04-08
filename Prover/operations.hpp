@@ -26,18 +26,33 @@
 #include <algcuda/interval.hpp>
 
 namespace circlecover {
+	/**
+	 * @brief An interval type with double endpoints.
+	 */
 	using IV = algcuda::Interval<double>;
+	/**
+	 * @brief An uncertain boolean type (false, true, indeterminate).
+	 */
 	using UB = algcuda::Uncertain<bool>;
 
+	/**
+	 * @brief A points with interval coordinates.
+	 */
 	struct Point {
 		IV x, y;
 	};
 
+	/**
+	 * @brief Result type for intersection of two circles.
+	 */
 	struct Intersection_points {
 		Point p[2];
 		bool definitely_intersecting;
 	};
 
+	/**
+	 * @brief Circle with interval center and radius.
+	 */
 	struct Circle {
 		Point      center;
 		IV squared_radius;

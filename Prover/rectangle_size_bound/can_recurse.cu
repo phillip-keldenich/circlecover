@@ -20,21 +20,29 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
-#include "strategies.cuh"
+#include "strategies.cuh"  // For documentation comments, see declarations in strategies.cuh.
 #include "../tight_rectangle/strategies.cuh"
 
+
 __device__ bool circlecover::rectangle_size_bound::can_recurse(double lb_weight_remaining, double ub_largest_disk_weight, double ub_w, double ub_h) {
+	// the best covering ratio we can obtain with Lemma 3
 	const double C = 195.0/256.0;
+	// the smallest lambda from which Lemma 3 starts being better than Theorem 1
 	const double tolerated_lambda = 2.0898841580413813901;
 	
+	// if there is no remaining weight:
 	if(lb_weight_remaining <= 0.0) {
+		// strictly negative weight remaining:
+		// err on the side of caution and return false here
 		if(lb_weight_remaining < 0.0) {
 			return false;
 		}
 
+		// possibly no weight remaining: check for empty rectangle
 		return (ub_w <= 0.0) | (ub_h <= 0.0);
 	}
 
+	// otherwise, if the rectangle is empty, return true
 	if(ub_w <= 0.0 || ub_h <= 0.0) {
 		return true;
 	}
@@ -43,8 +51,11 @@ __device__ bool circlecover::rectangle_size_bound::can_recurse(double lb_weight_
 	double side_min = ub_w < ub_h ? ub_w : ub_h;
 	double side_max = ub_w < ub_h ? ub_h : ub_w;
 	
-	// first, try recursion using the strong size-bounded result; for that purpose, we try to enlarge the area
+	// first, try recursion using the strong size-bounded result (Lemma 4);
+	// for that purpose, we try to enlarge the area:
+	// compute the maximum area we CAN cover using the weight (rounding down)
 	double sb_max_area = __ddiv_rd(lb_weight_remaining, critical_ratio);
+	// compute the maximum side length of the shorter rectangle side (rounding down)
 	double sb_max_side_min = __ddiv_rd(sb_max_area, side_max);
 	if(sb_max_side_min < side_min) {
 		// we cannot cover the area with the remaining weight, even using the strong size-bounded result;
@@ -53,29 +64,35 @@ __device__ bool circlecover::rectangle_size_bound::can_recurse(double lb_weight_
 	}
 
 	if(sb_max_side_min > side_max) {
-		// we can enlarge the smaller side to a length greater than the current longer side; increase both side lengths
+		// we can enlarge the smaller side to a length greater than the current longer side;
+		// increase both side lengths to the square root of the area, making R' square
 		sb_max_side_min = __dsqrt_rd(sb_max_area);
 	}
 
-	// check the size bound
+	// check the size bound: scale weight-bound by square of shorter side length
 	double scaled_size_bound = __dmul_rd(ub_disk_weight, __dmul_rd(sb_max_side_min, sb_max_side_min));
 	if(scaled_size_bound >= ub_largest_disk_weight) {
+		// size bound and weight bound work out
 		return true;
 	}
 
 	// the strong size-bounded result does not work
 	double ub_skew = __ddiv_ru(side_max, side_min);
 	if(ub_skew <= tolerated_lambda) {
-		// the worst-case result is the best that we have
+		// the worst-case result (Theorem 1) is the best that we have;
+		// compute (an upper bound on) the critical ratio given by it
 		double cr = tight_rectangle::critical_ratio(IV(__ddiv_rd(side_max, side_min),ub_skew)).get_ub();
+		// check if we have the necessary weight
 		double necessary_weight = __dmul_ru(cr, __dmul_ru(ub_w, ub_h));
 		return necessary_weight <= lb_weight_remaining;
 	} else {
-		// try the large size bound corollary first
+		// try Lemma 3 first; scale the size bound to our largest disk weight
 		double sigma_scaled = __ddiv_ru(ub_largest_disk_weight, __dmul_rd(side_min, side_min));
 		sigma_scaled = __dmul_ru(sigma_scaled, sigma_scaled);
 		double cr = __dmul_ru(0.5, __dsqrt_ru(__dadd_ru(__dsqrt_ru(__dadd_ru(sigma_scaled, 1.0)), 1.0)));
+		// we cannot get better than C
 		if(cr < C) { cr = C; }
+		// compute and check necessary weight
 		double necessary_weight = __dmul_ru(cr, __dmul_ru(ub_w, ub_h));
 		if(necessary_weight <= lb_weight_remaining) {
 			return true;
@@ -91,10 +108,12 @@ __device__ double circlecover::rectangle_size_bound::bound_critical_ratio(double
 	const double C = 195.0/256.0;
 
 	if(lb_weight_remaining < 0.0) {
+		// infinity if there is no remaining disks
 		return DBL_MAX*DBL_MAX;
 	}
 
 	if(ub_w <= 0.0 || ub_h <= 0.0) {
+		// empty rectangle
 		return 0.0;
 	}
 
@@ -104,7 +123,7 @@ __device__ double circlecover::rectangle_size_bound::bound_critical_ratio(double
 	double best_critical_ratio = DBL_MAX*DBL_MAX;
 	double ub_area = __dmul_ru(ub_w, ub_h);
 
-	// first, try using strong size-bounded result
+	// first, try using strong size-bounded result (Lemma 4) directly
 	double required_side_length = __dsqrt_ru(__ddiv_ru(ub_largest_disk_weight, ub_disk_weight));
 	if(side_min >= required_side_length) {
 		double weight_required = __dmul_ru(critical_ratio, ub_area);
@@ -114,6 +133,8 @@ __device__ double circlecover::rectangle_size_bound::bound_critical_ratio(double
 			return DBL_MAX*DBL_MAX;
 		}
 	} else {
+		// otherwise, try using Lemma 4 after growing the rectangle.
+		// this increases the critical ratio.
 		if(required_side_length > side_max) {
 			double square_area = __ddiv_rd(lb_weight_remaining, critical_ratio);
 			double square_side_length = __dsqrt_rd(square_area);
@@ -133,7 +154,7 @@ __device__ double circlecover::rectangle_size_bound::bound_critical_ratio(double
 		}
 	}
 
-	// second, try size bounded result for large size bound
+	// second, try size bounded result for large size bound (Lemma 3)
 	double scaled_sigma = __ddiv_ru(ub_largest_disk_weight, __dmul_rd(side_min,side_min));
 	scaled_sigma = __dmul_ru(scaled_sigma, scaled_sigma);
 	double eff_cor = __dmul_ru(0.5, __dsqrt_ru(__dadd_ru(__dsqrt_ru(__dadd_ru(scaled_sigma, 1.0)), 1.0)));

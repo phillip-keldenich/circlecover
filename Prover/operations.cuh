@@ -27,10 +27,36 @@
 #include <algcuda/interval.cuh>
 
 namespace circlecover {
+	/**
+	 * @brief Compute the squared distance between two points p1, p2 (in interval arithmetic).
+	 * 
+	 * @param p1 Point p1.
+	 * @param p2 Point p2.
+	 * @return IV Interval for the squared distance. 
+	 */
 	__device__ IV  squared_distance(const Point& p1, const Point& p2);
+
+	/**
+	 * @brief Compute the intersection point(s) of two circles in interval arithmetic.
+	 * 
+	 * The most general result this function can return is "not sure if there is an intersection".
+	 * In that case, the output of the method cannot be realistically used (because there might be an intersection,
+	 * but there might also be none).
+	 * 
+	 * @param c1 
+	 * @param c2 
+	 * @return Intersection_points A structure describing the points and whether the intersection is certain. 
+	 */
 	__device__ Intersection_points intersection(const Circle& c1, const Circle& c2);
+
+	/**
+	 * @brief Compute the center point between two points (in interval arithmetic).
+	 * 
+	 * @param p1 
+	 * @param p2 
+	 * @return Point The center. 
+	 */
 	__device__ Point center(const Point& p1, const Point& p2);
 }
 
 #endif
-

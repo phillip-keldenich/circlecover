@@ -25,8 +25,16 @@
 
 volatile std::sig_atomic_t circlecover::was_interrupted = 0;
 
+/**
+ * @brief Store the old signal handler.
+ */
 static void (*previous_sigint_handler)(int) = nullptr;
 
+/**
+ * @brief Signal handler that sets our flag.
+ * If it receives a second signal if the interrupt was already triggered,
+ * it terminates the program.
+ */
 static void our_sigint_handler(int) {
 	if(circlecover::was_interrupted) {
 		std::_Exit(SIGINT);

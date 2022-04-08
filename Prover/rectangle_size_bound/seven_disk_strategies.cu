@@ -108,9 +108,6 @@ __device__ static inline bool three_disk_top_strip_can_cover(double la, double t
 	} else if(lb_h_l2 >= ub_hrem_l2) {
 		return true;
 	}
-
-	// try to make use of the shape of the top strip
-	// potential TODO
 	return false;
 }
 

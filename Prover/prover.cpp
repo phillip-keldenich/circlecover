@@ -30,9 +30,15 @@ namespace circlecover {
 	}
 }
 
+/**
+ * @brief Entry point of our prover.
+ * 
+ * @param argc 
+ * @param argv 
+ * @return int 
+ */
 int main(int argc, const char* argv[]) {
 	circlecover::tight_rectangle::find_critical_intervals();
 	circlecover::rectangle_size_bound::find_critical_intervals();
 	return 0;
 }
-
