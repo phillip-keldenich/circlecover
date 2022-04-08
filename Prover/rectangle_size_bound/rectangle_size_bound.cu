@@ -311,7 +311,6 @@ void __host__ circlecover::rectangle_size_bound::find_critical_intervals_in(cons
 
 void __host__ circlecover::rectangle_size_bound::find_critical_intervals() {
 	output_begin_case("Critical intervals for rectangles with small disks");
-	std::cout << "Size bound: r <= " << ub_disk_radius << ", critical ratio: " << critical_ratio << std::endl;
 	std::cerr << "Size bound: r <= " << ub_disk_radius << ", critical ratio: " << critical_ratio << std::endl;
 
 	Interval_buffer buffer;
@@ -326,6 +325,12 @@ void __host__ circlecover::rectangle_size_bound::find_critical_intervals() {
 	find_critical_intervals_in(initial, buffer, next_gen, false, true);
 	current_gen = merge_critical_intervals<0>(next_gen);
 	next_gen.clear();
+
+	if(current_gen.empty()) {
+		std::cerr << "No critical regions after initialization - done!" << std::endl;
+		output_end_case();
+		return;
+	}
 
 	std::cerr << "Starting refinement - press Ctrl-C to interrupt and use best result achieved so far...                                               " << std::endl;
 	start_interruptible_computation();

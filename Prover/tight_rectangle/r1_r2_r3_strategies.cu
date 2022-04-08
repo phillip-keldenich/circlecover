@@ -209,7 +209,7 @@ static inline bool __device__ manually_proved_three_disk_pocket(IV la, IV r1, IV
 	if(la.get_ub() > 1.0499999999999998) {
 		return false;
 	}
-	IV lasq = square(la);
+	IV lasq = la.square();
 	// the weight of a disk at the three-disk worst-case
 	IV rstar = 0.0625 * lasq + 0.15625 + 0.03515625 / lasq;
 	// check if we are fully in the manually-proved range

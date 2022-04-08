@@ -26,7 +26,28 @@
 using namespace circlecover;
 using namespace circlecover::tight_rectangle;
 
+static inline bool __device__ manually_proved_two_pocket(IV la, IV r1, IV r2) {
+	// quick detection if this cannot work at all
+	if(r2.get_lb() < 0.2400000000000000188 || r1.get_lb() < 0.4900000000000000466) {
+		return false;
+	}
+	IV lasq = la.square();
+	double r1req = (0.25 * (lasq + 1.0) - 0.00999999999999999847).get_ub();
+	if(r1.get_lb() < r1req) {
+		return false;
+	}
+	IV S1 = 2.0 * sqrt(r1 - 0.25);
+	IV pocket_width = la - S1;
+	pocket_width.tighten_lb(0.0);
+	double r2req = (0.25 + pocket_width.square() - 0.00999999999999999847).get_ub();
+	return r2.get_lb() >= r2req;
+}
+
 static inline bool __device__ r1_r2_strategies_simple(IV la, IV r1, IV r2, double ub_r3) {
+	if(manually_proved_two_pocket(la, r1, r2)) {
+		return true;
+	}
+
 	double lb_width = rectangle_size_bound::two_disks_maximize_height(r1, r2, 1.0);
 	if(lb_width <= 0.0) {
 		return false;

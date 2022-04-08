@@ -320,6 +320,7 @@ static void __host__ find_critical_intervals_in(const Variables& intervals, Inte
 }
 
 struct Max_distances {
+	bool have_range_2d, have_range_3d;
 	IV la_range_2d, la_range_3d;
 	IV dist_r1_2d;
 	Variables dist_r1_2d_criticals[2];
@@ -340,13 +341,10 @@ struct Max_distances {
 };
 
 static __global__ void kernel_compute_distance_from_theoretical_worst_cases(const Variables* criticals, std::size_t num_criticals, Max_distances* output) {
-	if(criticals[0].radii[2].get_ub() < 0.1 || criticals[num_criticals-1].radii[2].get_ub() >= 0.1) {
-		printf("Unexpected first/last critical!\n");
-		algcuda::trap();
-	}
-	
-	output->la_range_3d = criticals[0].la;
-	output->la_range_2d = criticals[num_criticals-1].la;
+	output->have_range_2d = false;
+	output->have_range_3d = false;
+	output->la_range_3d = IV{1.0,1.0};
+	output->la_range_2d = IV{2.0,2.0};
 	output->dist_r1_2d = output->dist_r2_2d = IV{0.0,0.0};
 	output->ub_R3_2d = output->ub_R4_3d = 0.0;
 	output->dist_r1_3d = output->dist_r2_3d = output->dist_r3_3d = IV{0.0,0.0};
@@ -359,6 +357,7 @@ static __global__ void kernel_compute_distance_from_theoretical_worst_cases(cons
 		if(vars.radii[2].get_ub() < 0.1) {
 			// classify this as 2-disk critical
 			// r_1 is the circumcircle; r_2^2 is 0.25
+			output->have_range_2d = true;
 			output->la_range_2d.do_join(vars.la);
 			IV r1_theoretical = 0.25 * (vars.la.square() + 1.0);
 			IV r2_theoretical{0.25,0.25};
@@ -398,6 +397,7 @@ static __global__ void kernel_compute_distance_from_theoretical_worst_cases(cons
 			}
 		} else {
 			// classify this as 3-disk critical
+			output->have_range_3d = true;
 			output->la_range_3d.do_join(vars.la);
 			IV la_2 = vars.la.square();
 			IV la_4 = la_2.square();
@@ -505,27 +505,32 @@ void circlecover::tight_rectangle::find_critical_intervals() {
 		Max_distances result;
 		algcuda::device::copy(result_d, &result);
 
-		std::cout << "Two disks: Range for lambda that contains 2-disk critical intervals: " << result.la_range_2d << "; maximal distances from theoretical values: " << std::endl;
-		std::cout << "\tr_1^2: " << result.dist_r1_2d << ", r_2^2: " << result.dist_r2_2d << ", R_3 <= " << result.ub_R3_2d << ", h_1 >= " << result.lb_h1_2d << ", lambda / S_1 <= " << result.ub_la_by_S1 << std::endl;
-		std::cout << "\tDominating criticals for r_1: " << std::endl;
-		std::cout << "\t\t" << result.dist_r1_2d_criticals[0] << std::endl;
-		std::cout << "\t\t" << result.dist_r1_2d_criticals[1] << std::endl;
-		std::cout << "\tDominating criticals for r_2: " << std::endl;
-		std::cout << "\t\t" << result.dist_r2_2d_criticals[0] << std::endl;
-		std::cout << "\t\t" << result.dist_r2_2d_criticals[1] << std::endl;
+		if(result.have_range_2d) {
+			std::cout << "Two disks: Range for lambda that contains 2-disk critical intervals: " << result.la_range_2d << "; maximal distances from theoretical values: " << std::endl;
+			std::cout << "\tr_1^2: " << result.dist_r1_2d << ", r_2^2: " << result.dist_r2_2d << ", R_3 <= "
+				      << result.ub_R3_2d << ", h_1 >= " << result.lb_h1_2d << ", lambda / S_1 <= " << result.ub_la_by_S1 << std::endl;
+			std::cout << "\tDominating criticals for r_1: " << std::endl;
+			std::cout << "\t\t" << result.dist_r1_2d_criticals[0] << std::endl;
+			std::cout << "\t\t" << result.dist_r1_2d_criticals[1] << std::endl;
+			std::cout << "\tDominating criticals for r_2: " << std::endl;
+			std::cout << "\t\t" << result.dist_r2_2d_criticals[0] << std::endl;
+			std::cout << "\t\t" << result.dist_r2_2d_criticals[1] << std::endl;
+		}
 
-		std::cout << "Three disks: Range for lambda that contains 3-disk critical intervals: " << result.la_range_3d << "; maximal distances from theoretical values: " << std::endl;
-		std::cout << "\tr_1^2: " << result.dist_r1_3d << ", r_2^2: " << result.dist_r2_3d << ", r_3^2: " << result.dist_r3_3d << ", R_4 <= " << result.ub_R4_3d << std::endl;
-		std::cout << "\tS_1: " << result.S1 << ", h_2: " << result.h2 << ", S_3: " << result.S3 << ", pocket width <= " << result.pocket_width_3d << std::endl;
-		std::cout << "\tDominating criticals for r_1: " << std::endl;
-		std::cout << "\t\t" << result.dist_r1_3d_criticals[0] << std::endl;
-		std::cout << "\t\t" << result.dist_r1_3d_criticals[1] << std::endl;
-		std::cout << "\tDominating criticals for r_2: " << std::endl;
-		std::cout << "\t\t" << result.dist_r2_3d_criticals[0] << std::endl;
-		std::cout << "\t\t" << result.dist_r2_3d_criticals[1] << std::endl;
-		std::cout << "\tDominating criticals for r_3: " << std::endl;
-		std::cout << "\t\t" << result.dist_r3_3d_criticals[0] << std::endl;
-		std::cout << "\t\t" << result.dist_r3_3d_criticals[1] << std::endl;
+		if(result.have_range_3d) {
+			std::cout << "Three disks: Range for lambda that contains 3-disk critical intervals: " << result.la_range_3d << "; maximal distances from theoretical values: " << std::endl;
+			std::cout << "\tr_1^2: " << result.dist_r1_3d << ", r_2^2: " << result.dist_r2_3d << ", r_3^2: " << result.dist_r3_3d << ", R_4 <= " << result.ub_R4_3d << std::endl;
+			std::cout << "\tS_1: " << result.S1 << ", h_2: " << result.h2 << ", S_3: " << result.S3 << ", pocket width <= " << result.pocket_width_3d << std::endl;
+			std::cout << "\tDominating criticals for r_1: " << std::endl;
+			std::cout << "\t\t" << result.dist_r1_3d_criticals[0] << std::endl;
+			std::cout << "\t\t" << result.dist_r1_3d_criticals[1] << std::endl;
+			std::cout << "\tDominating criticals for r_2: " << std::endl;
+			std::cout << "\t\t" << result.dist_r2_3d_criticals[0] << std::endl;
+			std::cout << "\t\t" << result.dist_r2_3d_criticals[1] << std::endl;
+			std::cout << "\tDominating criticals for r_3: " << std::endl;
+			std::cout << "\t\t" << result.dist_r3_3d_criticals[0] << std::endl;
+			std::cout << "\t\t" << result.dist_r3_3d_criticals[1] << std::endl;
+		}
 	}
 
 	output_end_case();
