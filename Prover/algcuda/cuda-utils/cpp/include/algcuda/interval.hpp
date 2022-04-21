@@ -244,7 +244,7 @@ namespace algcuda {
 		}
 
 		/**
-		 * @brief Compute the reciprocal interval 1/*this.
+		 * @brief Compute the reciprocal interval 1 / *this.
 		 * 
 		 * @return Interval<NumType> 
 		 */
