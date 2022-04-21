@@ -33,6 +33,7 @@ namespace circlecover {
  * @brief Everything that is specific to the automated proof of the size-bounded lemma (Lemma 4).
  */
 namespace rectangle_size_bound {
+
 /**
  * @brief Compute a bound on the weight difference between two groups resulting from Greedy Splitting.
  * 
@@ -145,8 +146,6 @@ __device__ bool multi_disk_strip_vertical(const Variables& vars, const Intermedi
  */
 __device__ bool advanced_multi_disk_strip_vertical(const Variables& vars, const Intermediate_values& vals);
 
-// try covering one corner with r1, the opposite corner with r2 and recurse (using both types of recursion) on the rest
-
 /**
  * @brief Check whether we can guarantee success by placing r_1 and r_2 in opposite corners.
  * See section "Placing r_1 and r_2 in Opposite Corners".
@@ -234,13 +233,47 @@ struct Max_height_strip_2 {
  * @return Max_height_strip_2 
  */
 __device__ Max_height_strip_2 two_disks_maximal_height_strip(IV la, IV r1, IV r2);
+
+/**
+ * @brief Check whether three disks can cover a rectangle of given width and height.
+ * 
+ * @param r1 
+ * @param r2 
+ * @param r3 
+ * @param width 
+ * @param height 
+ * @return true if a cover is definitely possible; false otherwise.
+ */
 __device__ bool three_disks_can_cover(IV r1, IV r2, IV r3, double width, double height);
+
+/**
+ * @brief Maximize the height of the covered subrectangle of a rectangle of given width using three given disks.
+ * 
+ * @param r1 
+ * @param r2 
+ * @param r3 
+ * @param ub_w An upper bound on the width of the rectangle.
+ * @return A lower bound on the height that can definitely be covered by the disks. 
+ */
 __device__ double three_disks_maximize_height(IV r1, IV r2, IV r3, double ub_w);
 
+/**
+ * @brief Datastructure describing a placement of two disks and a covered height.
+ */
 struct Max_height_strip_wc_recursion_2 {
 	Circle c1, c2;
 	double lb_height;
 };
+
+/**
+ * @brief Maximize the height of the covered subrectangle of a rectangle of given width,
+ *        using two disks and the worst-case optimal result for recursion with some remaining weight R.
+ * @param r1 The squared radius of the larger disk.
+ * @param r2 The squared radius of the smaller disk.
+ * @param R The total disk weight that may be used for recursion.
+ * @param ub_w An upper bound on the width of the rectangle.
+ * @return Max_height_strip_wc_recursion_2 describing the disk placement and covered height.
+ */
 __device__ Max_height_strip_wc_recursion_2 two_disks_maximal_height_strip_wc_recursion(IV r1, IV r2, IV R, double ub_w);
 
 /**
@@ -350,28 +383,63 @@ __device__ double bound_worst_case_ratio(IV w, IV h);
  */
 __device__ double  six_disks_maximize_covered_width(const Variables& vars);
 
-// compute the range of squared radii for which an efficiency of critical_ratio can be achieved when covering a rectangular substrip of a strip of smaller side length h
-// and longer side length at least lb_w
+/**
+ * @brief For a strip of given height and width, compute a range of (squared) radii which can be placed
+ *        covering a subrectangle of height h efficiently enough, i.e., within a factor of at most critical_ratio
+ *        critical_ratio between the covered area and the disk weight.
+ * 
+ * @param lb_w A lower bound on the width (longer side length) of the strip.
+ * @param h An interval for the height (smaller side length) of the strip.
+ * @return IV A range within which the efficiency is definitely good enough. 
+ */
 __device__ IV compute_efficient_rectangle_cover_weight_range(double lb_w, IV h);
 
-// place r1 in the bottom-left corner and try to cover the remaining space above or to its right using 2-5 explicitly considered disks
-__device__ bool   r1_in_corner_explicit_recursion(const Variables& vars, const Intermediate_values& vals); // Subsection Using the four largest disks and Subsection Building a Strip
-__device__ bool   r1_in_corner_wall_building_recursion(const Variables& vars, const Intermediate_values& vals); // Subsection Placing r_1 in a corner
+/**
+ * @brief Check if a covering routine that is based on placing
+ *        the largest disk in the lower left corner is guaranteed to succeed.
+ * See subsections "Using the Four Largest Disks" and "Building a Strip".
+ * @param vars 
+ * @param vals 
+ * @return true iff the covering routine definitely works.
+ */
+__device__ bool r1_in_corner_explicit_recursion(const Variables& vars, const Intermediate_values& vals);
 
-// cover a strip at the left side using 2x2 disks
+/**
+ * @brief Check if a covering routine that is based on placing
+ *        the largest disk in thee lower left corner and using
+ *        Wall Building above it is guaranteed to succeed.
+ * See section Placing r_1 in a Corner.
+ * 
+ * @param vars 
+ * @param vals 
+ * @return true iff the covering routine definitely works.
+ */
+__device__ bool r1_in_corner_wall_building_recursion(const Variables& vars, const Intermediate_values& vals);
+
+/**
+ * @brief Cover a subrectangle of height 1 using 2 columns of two disks.
+ * 
+ * @param disks A pointer to the four (squared) disk radii.
+ * @return Two_by_two_cover A description of the 2x2 cover and a lower bound on its width. 
+ */
 __device__ Two_by_two_cover compute_two_by_two_cover(const IV* disks);
 
-// cover an L-shaped region using explicit disks and recurse on the remaining parts
-
-__device__ bool l_shaped_recursion(const Variables& vars, const Intermediate_values& vals); // Subsection Using the three largest disks
-
-// cover a strip at the left side using 2x2 disks; cover the remaining strip using the two remaining disks and recursion
 /**
- * @brief 
+ * @brief Check if a covering routine based on covering an L-shaped region using 3 disks is guaranteed to succeed.
+ * See section "Using the Three Largest Disks".
  * 
  * @param vars 
  * @param vals 
  * @return __device__ 
+ */
+__device__ bool l_shaped_recursion(const Variables& vars, const Intermediate_values& vals); // Subsection Using the three largest disks
+
+/**
+ * @brief Check if using a 2x2 cover and recursion to cover the remaining rectangle is guaranteed to succeed.
+ * 
+ * @param vars 
+ * @param vals 
+ * @return true if we can guarantee success; false otherwise.
  */
 __device__ bool  two_by_two_cover_with_strip_and_recursion(const Variables& vars, const Intermediate_values& vals);
 
