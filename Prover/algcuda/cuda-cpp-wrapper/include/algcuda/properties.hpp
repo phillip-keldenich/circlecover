@@ -65,10 +65,13 @@ namespace algcuda {
 		 * Only use once the default device has been (implicitly) set.
 		 */
 		namespace cached {
+			/**
+			 * @brief A cached version of the max_threads_per_block function.
+			 * @return int 
+			 */
 			int max_threads_per_block();
 		}
 	}
 }
 
 #endif
-

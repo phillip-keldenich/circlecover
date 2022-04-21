@@ -20,22 +20,37 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+/**
+ * @file algcuda/exit.cuh Some functions to abort computations from within a CUDA kernel.
+ */
+
 #ifndef ALGCUDA_UTILS_EXIT_CUH_INCLUDED_
 #define ALGCUDA_UTILS_EXIT_CUH_INCLUDED_
 
 namespace algcuda {
-	// cancel execution of current kernel with an error
+	/**
+	 * @brief Cancel execution of the current kernel with an error.
+	 */
 	inline __device__ void trap() noexcept {
 		__threadfence();
 		asm("trap;\n");
 	}
 
+	/**
+	 * @brief Cancel execution of the current kernel, printing an error message.
+	 * 
+	 * @param expr 
+	 * @param file 
+	 * @param line 
+	 */
 	inline __device__ void assert_trap(const char* expr, const char* file, int line) noexcept {
 		printf("Assertion '%s' (%s:%d) failed!\n", expr, file, line);
 		trap();
 	}
 
-	// exit execution of current thread
+	/**
+	 * @brief Cancel execution of the current kernel without raising an error.
+	 */
 	inline __device__ void exit() noexcept {
 		asm("exit;\n");
 	}
@@ -44,8 +59,11 @@ namespace algcuda {
 #ifdef NDEBUG
 #define ALGCUDA_ASSERT(expr) ((void)0)
 #else
+/**
+ * @brief A CUDA assertion macro (traps if false, printing an error).
+ * Does nothing if NDEBUG is defined.
+ */
 #define ALGCUDA_ASSERT(expr) ((void)((expr) ? 0 : (::algcuda::assert_trap( #expr , __FILE__, __LINE__), 0)))
 #endif
 
 #endif
-

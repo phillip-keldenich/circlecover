@@ -23,6 +23,10 @@
 #ifndef ALGCUDA_INTERVAL_CUH_INCLUDED_
 #define ALGCUDA_INTERVAL_CUH_INCLUDED_
 
+/**
+ * @file Implementation of interval arithmetic operations on CUDA devices.
+ */
+
 #include <algcuda/interval.hpp>
 #include <algcuda/exit.cuh>
 

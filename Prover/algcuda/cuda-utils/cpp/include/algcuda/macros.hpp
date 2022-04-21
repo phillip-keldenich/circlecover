@@ -20,19 +20,32 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+/**
+ * @file algcuda/macros.hpp Some macros to work with CUDA.
+ */
+
 #ifndef ALGCUDA_UTILS_MACROS_HPP_INCLUDED_
 #define ALGCUDA_UTILS_MACROS_HPP_INCLUDED_
 
 #ifndef __CUDACC__
 
+/**
+ * @brief Make sure __device__ is defined away if we are not using a CUDA-capable compiler.
+ */
 #ifndef __device__
 #define __device__
 #endif
 
+/**
+ * @brief Make sure __host__ is defined away if we are not using a CUDA-capable compiler.
+ */
 #ifndef __host__
 #define __host__
 #endif
 
+/**
+ * @brief Make sure __global__ is defined away if we are not using a CUDA-capable compiler.
+ */
 #ifndef __global__
 #define __global__
 #endif
@@ -40,4 +53,3 @@
 #endif
 
 #endif
-

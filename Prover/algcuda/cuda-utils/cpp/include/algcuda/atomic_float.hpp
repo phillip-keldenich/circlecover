@@ -20,6 +20,10 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+/**
+ * @file algcuda/atomic_float.hpp Atomic wrapper for double.
+ */
+
 #ifndef ALGCUDA_ATOMIC_FLOAT_HPP_INCLUDED_
 #define ALGCUDA_ATOMIC_FLOAT_HPP_INCLUDED_
 
@@ -27,21 +31,42 @@
 #include <algcuda/macros.hpp>
 
 namespace algcuda {
+	/**
+	 * @brief An atomic double type that allows atomic max/min operations.
+	 * The value is actually stored as unsigned long long and transformed
+	 * to keep the ordering intact.
+	 */
 	class Atomic_ordered_double {
 	public:
+		/**
+		 * @brief Set the value.
+		 * @param d The value to set the atomic double to.
+		 */
 		__host__ __device__ void set(double d) noexcept {
 			value = transform(d);
 		}
 
+		/**
+		 * @brief Get the value.
+		 * @return double The value.
+		 */
 		__host__ __device__ double get() const noexcept {
 			return inverse_transform(value);
 		}
 
 #ifdef __CUDACC__
+		/**
+		 * @brief Atomically store the given value if it is greater than the current value.
+		 * @param v The new value to store.
+		 */
 		__device__ void store_max(double v) noexcept {
 			atomicMax(&value, transform(v));
 		}
 
+		/**
+		 * @brief Atomically store the given value if it is less than the current value.
+		 * @param v The new value to store.
+		 */
 		__device__ void store_min(double v) noexcept {
 			atomicMin(&value, transform(v));
 		}
