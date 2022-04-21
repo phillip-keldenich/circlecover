@@ -135,6 +135,12 @@ namespace algcuda {
 		return std::error_condition(static_cast<int>(ec), cuda_category());
 	}
 
+	/**
+	 * @brief Throw a std::system_error if we had a CUDA error.
+	 * 
+	 * @param ev The error code from CUDA.
+	 * @param message A message.
+	 */
 	inline void throw_if_cuda_error(int ev, std::string message) noexcept(false) {
 		if(ev != 0) {
 			last_error::clear();
@@ -142,6 +148,14 @@ namespace algcuda {
 		}
 	}
 
+	/**
+	 * @brief Throw a std::system_error if we had a CUDA error.
+	 * 
+	 * @param ev The error code from CUDA.
+	 * @param message A message.
+	 * @param file The file the error occurred in.
+	 * @param line The line the error occurred in.
+	 */
 	inline void throw_if_cuda_error(int ev, const std::string& message, const char* file, int line) noexcept(false) {
 		if(ev != 0) {
 			last_error::clear();
@@ -151,7 +165,9 @@ namespace algcuda {
 		}
 	}
 
+/**
+ * @brief A macro to make using throw_if_cuda_error easier.
+ */
 #define ALGCUDA_THROW_IF_ERROR(expr, msg) ::algcuda::throw_if_cuda_error((expr), msg, __FILE__, __LINE__)
 
 }
-
