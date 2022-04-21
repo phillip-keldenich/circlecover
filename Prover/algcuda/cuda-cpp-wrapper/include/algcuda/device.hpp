@@ -20,6 +20,10 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+/**
+ * @file algcuda/device.hpp CUDA-device related utility functions.
+ */
+
 #ifndef ALGCUDA_DEVICE_HPP
 #define ALGCUDA_DEVICE_HPP
 
@@ -29,11 +33,21 @@
 
 namespace algcuda {
 	namespace device {
+		/**
+		 * @brief Synchronize with the current CUDA device.
+		 */
 		void synchronize();
+		/**
+		 * @brief Synchronize with the current CUDA device, checking for errors.
+		 */
 		void synchronize_check_errors();
+
+		/**
+		 * @brief Set the printf buffer size for the current device.
+		 * @param bytes The size, in bytes, of the buffer to set.
+		 */
 		void set_printf_buffer_size(std::size_t bytes);
 	}
 }
 
 #endif //ALGCUDA_DEVICE_HPP
-
