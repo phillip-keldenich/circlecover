@@ -28,8 +28,11 @@
 #include "../operations.cuh"
 
 namespace circlecover {
-namespace rectangle_size_bound {
 
+/**
+ * @brief Everything that is specific to the automated proof of the size-bounded lemma (Lemma 4).
+ */
+namespace rectangle_size_bound {
 /**
  * @brief Compute a bound on the weight difference between two groups resulting from Greedy Splitting.
  * 
@@ -83,35 +86,155 @@ __device__ double bound_required_height(double r_squared_ub);
  */
 __device__ double bound_allowed_weight(double lb_height);
 
-// try recursion using an uneven split
-__device__ bool uneven_split_recursion(const Variables& vars, const Intermediate_values& vals); // Subsection Even and uneven recursive splitting
+/**
+ * @brief Try recursion after performing an unbalanced partitioning of all disks into two sets.
+ * This is the implementation of the subroutine described in the section
+ * "Balanced and Unbalanced Recursive Splitting".
+ * 
+ * @param vars 
+ * @param vals 
+ * @return true if an unbalanced split definitely allows us to recurse; false otherwise.
+ */
+__device__ bool uneven_split_recursion(const Variables& vars, const Intermediate_values& vals);
+
+/**
+ * @brief A shortcut version of uneven_split_recursion that only considers lambda, r1 and r2.
+ * This is used to avoid unnecessary subdivisions if it is already clear from the
+ * first few disks that an uneven split definitely works.
+ * 
+ * @param la 
+ * @param r1 
+ * @param r2 
+ * @return true if an unbalanced split definitely allows us to recurse; false otherwise.
+ */
 __device__ bool shortcut_uneven_split_recursion(IV la, IV r1, IV r2);
+
+/**
+ * @brief A shortcut version of uneven_split_recursion that only considers lambda, r1, r2 and r3.
+ * This is used to avoid unnecessary subdivisions if it is already clear from the
+ * first few disks that an uneven split definitely works.
+ * 
+ * @param la 
+ * @param r1 
+ * @param r2 
+ * @param r3
+ * @return true if an unbalanced split definitely allows us to recurse; false otherwise.
+ */
 __device__ bool shortcut_uneven_split_recursion(IV la, IV r1, IV r2, IV r3);
 
-// try covering a vertical strip with some subset of the first 6 disks
-__device__ bool multi_disk_strip_vertical(const Variables& vars, const Intermediate_values& vals); // Subsection Building a Strip
-// an advanced, more expensive version of constructing a multi-disk strip that allows us to use recursion on the remainder, designed to avoid as many avoidable criticals as possible
-__device__ bool advanced_multi_disk_strip_vertical(const Variables& vars, const Intermediate_values& vals); // Subsection Building a Strip
+/**
+ * @brief Check whether some (simple) placement of a subset of the first 6 disks
+ * allows us to cover a vertical strip of our rectangle such that afterwards,
+ * we can recurse on the remaining rectangle. See section "Building a Strip".
+ * 
+ * @param vars 
+ * @param vals 
+ * @return true iff a simple placement of disks definitely works.
+ */
+__device__ bool multi_disk_strip_vertical(const Variables& vars, const Intermediate_values& vals);
+
+/**
+ * @brief A more expensive, more thorough version of multi_disk_strip_vertical.
+ * It is invoked later in the search than the cheaper multi_disk_strip_vertical to save time.
+ * It tries more combinations and subsets; it also allows for the sub-strips to be non-rectangular
+ * and relies on circle-circle intersections.
+ * 
+ * @param vars 
+ * @param vals 
+ * @return true iff an advanced placement definitely works.
+ */
+__device__ bool advanced_multi_disk_strip_vertical(const Variables& vars, const Intermediate_values& vals);
 
 // try covering one corner with r1, the opposite corner with r2 and recurse (using both types of recursion) on the rest
+
+/**
+ * @brief Check whether we can guarantee success by placing r_1 and r_2 in opposite corners.
+ * See section "Placing r_1 and r_2 in Opposite Corners".
+ * 
+ * @param vars 
+ * @param vals 
+ * @return true if we can guarantee success with r1 and r2 placed in opposite corners.
+ */
 __device__ bool r1_r2_opposite_corners_recursion(const Variables& vars, const Intermediate_values& vals); // Subsection Placing r_1 and r_2 in opposing corners
+
+/**
+ * @brief A shortcut version of r1_r2_opposite_corners_recursion that only considers
+ *        lambda and r1, r2, r3 instead of all disks to avoid unnecessary subdivisions.
+ * 
+ * @param la
+ * @param r1
+ * @param r2
+ * @param r3
+ * @return true if we can guarantee success with r1 and r2 placed in opposite corners.
+ */
 __device__ bool shortcut_r1_r2_opposite_corners_recursion(IV la, IV r1, IV r2, IV r3);
 
-// try covering a vertical strip with r1 and r2, combined with several strategies on the remainder
-__device__ bool r1_r2_vertical_strip(const Variables& vars, const Intermediate_values& vals); // Subsection Using the three largest disks
+/**
+ * @brief Try several covering routines that are based on covering a vertical substrip of the rectangle
+ *        with r1 and r2 and various approaches for the remaining disks/rectangle.
+ * See section "Using the Three Largest Disks".
+ * 
+ * @param vars 
+ * @param vals 
+ * @return true if we can guarantee success with one of the covering routines. 
+ */
+__device__ bool r1_r2_vertical_strip(const Variables& vars, const Intermediate_values& vals);
+
+/**
+ * @brief A shortcut version of r1_r2_vertical_strip that only considers up to r3.
+ * Used to avoid unnecessary subdivisions.
+ * See section "Using the Three Largest Disks".
+ * 
+ * @param la 
+ * @param r1
+ * @param r2
+ * @param r3 
+ * @return true if we can guarantee success with one of the covering routines. 
+ */
 __device__ bool shortcut_r1_r2_vertical_strip(IV la, IV r1, IV r2, IV r3);
 
-// try to use the wall-building argument: either there is a wall or a certain amount of weight in disks below a certain size
-__device__ bool   vertical_wall_building_recursion(const Variables& vars, const Intermediate_values& vals); // Subsection Wall building
+/**
+ * @brief Check whether we can guarantee coverage by using our wall-building argument:
+ * Either we can successfully build a (column of) a wall,
+ * or a certain amount of weight is in sufficiently small disks.
+ * See section "Wall Building".
+ * 
+ * @param vars 
+ * @param vals 
+ * @return true iff the wall-building argument is guaranteed to work. 
+ */
+__device__ bool vertical_wall_building_recursion(const Variables& vars, const Intermediate_values& vals);
 
-// maximize the height of a strip of width w covered by two or three disks
+/**
+ * @brief Compute the maximum height of a strip of given width that can be covered by two disks.
+ * 
+ * @param r1 The (squared) radius of the first (larger) disk.
+ * @param r2 The (squared) radius of the second (larger) disk.
+ * @param ub_w An upper bound on the width of the strip.
+ * @return A lower bound on the height that can be covered by r1 and r2;
+ * 0 if it is possible that no height can be covered.
+ */
 __device__ double two_disks_maximize_height(IV r1, IV r2, double ub_w);
+
+/**
+ * @brief A datastructure describing a strip of maximal height covered by two disks.
+ */
 struct Max_height_strip_2 {
-	Circle c1, c2;
-	double lb_height; // for two_disks_maximal_width_strip, width
+	Circle c1, c2; //< The two disk positions.
+	double lb_height; //< A lower bound on the covered height.
 };
+
+/**
+ * @brief Compute a placement of two disks in a strip of width lambda.
+ * Maximize the height covered.
+ * 
+ * @param la 
+ * @param r1 
+ * @param r2 
+ * @return Max_height_strip_2 
+ */
 __device__ Max_height_strip_2 two_disks_maximal_height_strip(IV la, IV r1, IV r2);
-__device__ Max_height_strip_2 two_disks_maximal_width_strip(IV r1, IV r2);
+//__device__ Max_height_strip_2 two_disks_maximal_width_strip(IV r1, IV r2);
 __device__ bool three_disks_can_cover(IV r1, IV r2, IV r3, double width, double height);
 __device__ double three_disks_maximize_height(IV r1, IV r2, IV r3, double ub_w);
 
@@ -227,19 +350,6 @@ __device__ double bound_worst_case_ratio(IV w, IV h);
  * @return double A lower bound on the width of the strip that can be covered with the first six disks.
  */
 __device__ double  six_disks_maximize_covered_width(const Variables& vars);
-
-/**
- * @brief Datatype that describes the result of placing two disks such that they cover the
- * bottom side of our rectangle.
- */
-/*struct Bottom_row_2 {
-	/// The upper intersection point of the two disks.
-	Point upper_intersection;
-	/// The two disks.
-	Circle c1, c2;
-	/// A lower bound on the height covered on each side.
-	double lb_height_border;
-};*/
 
 // compute the range of squared radii for which an efficiency of critical_ratio can be achieved when covering a rectangular substrip of a strip of smaller side length h
 // and longer side length at least lb_w

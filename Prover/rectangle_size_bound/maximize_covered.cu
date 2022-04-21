@@ -149,7 +149,7 @@ __device__ Max_height_strip_2 circlecover::rectangle_size_bound::two_disks_maxim
 	return {{{0.5*w1, h}, {r1,r1}}, {{la-0.5*w2, h}, {r2,r2}}, __dmul_rd(2.0, h.get_lb())};
 }
 
-__device__ Max_height_strip_2 circlecover::rectangle_size_bound::two_disks_maximal_width_strip(IV r1_, IV r2_) {
+/*__device__ Max_height_strip_2 circlecover::rectangle_size_bound::two_disks_maximal_width_strip(IV r1_, IV r2_) {
 	const double r1 = r1_.get_lb();
 	const double r2 = r2_.get_lb();
 
@@ -166,7 +166,7 @@ __device__ Max_height_strip_2 circlecover::rectangle_size_bound::two_disks_maxim
 
 	IV w = sqrt(w1);
 	return {{{w, 0.5*h1}, {r1,r1}}, {{w, 1.0-0.5*h2}, {r2,r2}}, __dmul_rd(2.0, w.get_lb())};
-}
+}*/
 
 __device__ bool circlecover::rectangle_size_bound::three_disks_can_cover(IV r1, IV r2, IV r3, double width, double height) {
 	double h_sq = __dmul_ru(height, height);
