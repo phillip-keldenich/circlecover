@@ -234,7 +234,6 @@ struct Max_height_strip_2 {
  * @return Max_height_strip_2 
  */
 __device__ Max_height_strip_2 two_disks_maximal_height_strip(IV la, IV r1, IV r2);
-//__device__ Max_height_strip_2 two_disks_maximal_width_strip(IV r1, IV r2);
 __device__ bool three_disks_can_cover(IV r1, IV r2, IV r3, double width, double height);
 __device__ double three_disks_maximize_height(IV r1, IV r2, IV r3, double ub_w);
 
