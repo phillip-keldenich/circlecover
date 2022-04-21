@@ -26,68 +26,6 @@
 using namespace circlecover;
 using namespace circlecover::rectangle_size_bound;
 
-/*static __device__ bool five_disk_full_cover_3v2_recursion_on_border2(const Variables& vars, const Intermediate_values& vals) {
-	// fix lambda - we cover the biggest possible rectangle
-	IV la_covered{vars.la.get_ub(),vars.la.get_ub()};
-	IV R6 = vars.radii[5] + vals.R;
-	Bottom_row_2 bottom_row = compute_bottom_row(la_covered, vars.radii[0], vars.radii[1], R6);
-	if(bottom_row.lb_height_border <= 0.0) {
-		return false;
-	}
-
-	double ub_hrem = __dadd_ru(1.0, -bottom_row.lb_height_border);
-	double ub_hremsq = __dmul_ru(ub_hrem, ub_hrem);
-	double lb_w3 = __dadd_rd(__dmul_rd(4.0, vars.radii[2].get_lb()), -ub_hremsq);
-	double lb_w4 = __dadd_rd(__dmul_rd(4.0, vars.radii[3].get_lb()), -ub_hremsq);
-	if(lb_w3 <= 0.0 || lb_w4 <= 0.0) {
-		return false;
-	}
-	lb_w3 = __dsqrt_rd(lb_w3);
-	lb_w4 = __dsqrt_rd(lb_w4);
-
-	// we fix the placement of r3 and r4 such that they cover a lb_w3 x ub_hrem rectangle and thus the remaining parts of the horizontal border
-	IV r3{vars.radii[2].get_lb(), vars.radii[2].get_lb()};
-	IV r4{vars.radii[3].get_lb(), vars.radii[3].get_lb()};
-	IV y{__dadd_rd(1.0, -__dmul_ru(0.5, ub_hrem)), __dadd_ru(1.0, -__dmul_rd(0.5, ub_hrem))};
-	Circle c3{{ IV{0.5,0.5}*lb_w3, y }, r3};
-	Circle c4{{ la_covered - IV{0.5,0.5}*lb_w4, y }, r4};
-
-	double ub_wrem = __dadd_ru(la_covered.get_ub(), -__dadd_rd(lb_w3,lb_w4));
-	double ub_wremsq = __dmul_ru(ub_wrem, ub_wrem);
-	double dy5 = __dadd_rd(vars.radii[4].get_lb(), -__dmul_ru(0.25, ub_wremsq));
-	if(dy5 <= 0.0) {
-		return false;
-	}
-	dy5 = __dsqrt_rd(dy5);
-
-	IV r5{vars.radii[4].get_lb(), vars.radii[4].get_lb()};
-	Circle c5{{IV{0.5,0.5}*ub_wrem + lb_w3, IV{1.0,1.0} - dy5}, r5};
-
-	if(!definitely(squared_distance(bottom_row.upper_intersection, c5.center) <= r5)) {
-		return false;
-	}
-
-	Intersection_points x35 = intersection(c3, c5);
-	Intersection_points x45 = intersection(c4, c5);
-	if(!x35.definitely_intersecting || !x45.definitely_intersecting) {
-		// if this does not hold, raise an error
-		algcuda::trap();
-	}
-	UB comp_y_35 = (x35.p[0].y < x35.p[1].y);
-	UB comp_y_45 = (x45.p[0].y < x45.p[1].y);
-	if(!comp_y_35.is_certain() || !comp_y_45.is_certain()) {
-		// if this does not hold, raise an error
-		algcuda::trap();
-	}
-
-	Point left_lower_intersection  = (comp_y_35.get_lb() ? x35.p[0] : x35.p[1]);
-	Point right_lower_intersection = (comp_y_45.get_lb() ? x45.p[0] : x45.p[1]);
-	bool result = (definitely(squared_distance(left_lower_intersection,  bottom_row.c2.center) <= bottom_row.c2.squared_radius) &&
-		definitely(squared_distance(right_lower_intersection, bottom_row.c1.center) <= bottom_row.c1.squared_radius));
-
-	return result;
-}*/
-
 static __device__ bool five_disk_full_cover_3v2_recursion_center(const Variables& vars, const Intermediate_values& vals) {
 	// fix lambda - we cover the biggest possible rectangle
 	IV la_covered{vars.la.get_ub(),vars.la.get_ub()};

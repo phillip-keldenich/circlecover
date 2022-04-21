@@ -30,20 +30,57 @@
 namespace circlecover {
 namespace rectangle_size_bound {
 
-// compute a bound for the weight distance between the two groups after greedy splitting
+/**
+ * @brief Compute a bound on the weight difference between two groups resulting from Greedy Splitting.
+ * 
+ * @param vars The variables (i.e., lambda & disk radii).
+ * @param vals Some intermediate values we do not want to recompute (includes R, the remaining weight).
+ * @return double An upper bound on the weight difference between the two partitions resulting from Greedy Splitting. 
+ */
 __device__ double compute_even_split_distance_bound(const Variables& vars, const Intermediate_values& vals);
 
-// check whether an even split can be used for recursion
+/**
+ * @brief Check whether an 'even' split (i.e., trying to produce two roughly equal partitions by Greedy Splitting) allows recursion.
+ * 
+ * @param vars 
+ * @param vals 
+ * @return bool true if recursion based on even greedy splitting definitely works.
+ */
 __device__ bool   even_split_recursion(const Variables& vars, const Intermediate_values& vals); // Subsection Even and uneven recursive splitting
+
+/**
+ * @brief Same as even_split_recursion, but only considers lambda, r1 and r2 (as a shortcut to prevent unnecessary subdivision).
+ * @param la Lambda
+ * @param r1 Weight of r1.
+ * @param r2 Weight of r2.
+ * @return bool true if recursion based on even greedy splitting definitely works.
+ */
 __device__ bool   shortcut_even_split_recursion(IV la, IV r1, IV r2);
 
-// for a rectangle of given height (smaller side length), check that a disk characterized by r_squared is small enough to satisfy the size bound
+/**
+ * @brief For a rectangle with minimum side length height_lb,
+ * check if the disk with weight r_squared_ub satisfies the Lemma 4-size bound.
+ * 
+ * @param r_squared_ub 
+ * @param height_lb 
+ * @return true iff the disk definitely satisfies the size bound.
+ */
 __device__ bool   disk_satisfies_size_bound(double r_squared_ub, double height_lb);
 
-// check how large the height (smaller side length) has to be to contain a disk of given weight
+/**
+ * @brief Compute an upper bound on the necessary length of the smaller side if we want to use Lemma 4
+ * with a disk of weight at most r_squared_ub.
+ * @param r_squared_ub 
+ * @return  
+ */
 __device__ double bound_required_height(double r_squared_ub);
 
-// compute a lower bound on the maximum weight allowed in a rectangle of given height
+/**
+ * @brief Compute a lower bound on the allowed weight for a rectangle
+ * with shorter side at least lb_height.
+ * @param lb_height 
+ * @return 
+ */
 __device__ double bound_allowed_weight(double lb_height);
 
 // try recursion using an uneven split
@@ -90,7 +127,17 @@ __device__ bool   nd_can_cover(double ub_width, double ub_height, const IV* disk
 // generally, maximize the length of a strip of "width" w by n disks; 1 <= n <= 6; returns 0 if width is impossible
 __device__ double nd_maximize_covered(double ub_width, const IV* disks, int n);
 
-// check whether a ub_w x ub_h rectangle can be recursively covered (without size bound) given lb_weight_remaining weight
+/**
+ * @brief Check whether we can recurse using only our worst-case result (Theorem 1).
+ * This does not take into account size bounds on the disks; neither does it consider
+ * the case \lambda <= \bar{\lambda} (other than by returning 195/256, which is the
+ * worst worst-case ratio for that range.)
+ * 
+ * @param lb_weight_remaining 
+ * @param ub_w 
+ * @param ub_h 
+ * @return true if recursion definitely works solely based on Theorem 1; false otherwise.
+ */
 __device__ bool can_recurse_worst_case(double lb_weight_remaining, double ub_w, double ub_h);
 
 /**
@@ -157,22 +204,36 @@ __device__ double recursion_bound_size(double lb_weight_remaining, double ub_w, 
 __device__ double bound_worst_case_ratio(IV w, IV h);
 
 /**
- * @brief Check whether six disks can cover a strip of 
+ * @brief Maximize the width of a substrip of a height-1 strip that can be covered by six given disks.
  * 
- * @param vars 
- * @param width 
- * @return __device__ 
+ * @param vars The variables (lambda and the squared disk radii).
+ * @return double A lower bound on the width of the strip that can be covered with the first six disks.
  */
-//__device__ bool    six_disks_can_cover_width(const Variables& vars, double width);
 __device__ double  six_disks_maximize_covered_width(const Variables& vars);
 
 // a placement of two disks and recursion covering a strip at the bottom of the rectangle
+/**
+ * @brief Datatype that describes the result of placing two disks such that they cover the
+ * bottom side of our rectangle.
+ */
 struct Bottom_row_2 {
+	/// The upper intersection point of the two disks.
 	Point upper_intersection;
+	/// The two disks.
 	Circle c1, c2;
+	/// A lower bound on the height covered on each side.
 	double lb_height_border;
 };
-__device__ Bottom_row_2 compute_bottom_row(IV la, IV larger, IV smaller, IV recursion_weight);
+/**
+ * @brief Compute a Bottom_row_2 result from lambda, two disks and 
+ * 
+ * @param la 
+ * @param larger 
+ * @param smaller 
+ * @param recursion_weight 
+ * @return Bottom_row_2  
+ */
+//__device__ Bottom_row_2 compute_bottom_row(IV la, IV larger, IV smaller, IV recursion_weight);
 
 // compute the range of squared radii for which an efficiency of critical_ratio can be achieved when covering a rectangular substrip of a strip of smaller side length h
 // and longer side length at least lb_w
