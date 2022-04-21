@@ -121,10 +121,27 @@ struct Max_height_strip_wc_recursion_2 {
 };
 __device__ Max_height_strip_wc_recursion_2 two_disks_maximal_height_strip_wc_recursion(IV r1, IV r2, IV R, double ub_w);
 
-// try to decide whether the n disks pointed to by disks can definitely cover a strip of ub_width times ub_height
+/**
+ * @brief Check whether n given disks can definitely cover a strip of given width/height.
+ * 
+ * @param ub_width An upper bound on the strip's width.
+ * @param ub_height An upper bound on the strip's height.
+ * @param disks The squared disk radii.
+ * @param n The number of disks.
+ * @return true if the cover definitely works; false otherwise.
+ */
 __device__ bool   nd_can_cover(double ub_width, double ub_height, const IV* disks, int n);
 
-// generally, maximize the length of a strip of "width" w by n disks; 1 <= n <= 6; returns 0 if width is impossible
+/**
+ * @brief Maximize the the height of a strip of a given width that can be covered by a given number of disks.
+ * 
+ * Uses binary search/bisection for the more complex cases.
+ * 
+ * @param ub_width An upper bound on the strip's width.
+ * @param disks The squared disk radii.
+ * @param n The number of disks.
+ * @return The amount of strip height that can definitely be covered; 0 if no cover may be possible at all.
+ */
 __device__ double nd_maximize_covered(double ub_width, const IV* disks, int n);
 
 /**
@@ -211,29 +228,18 @@ __device__ double bound_worst_case_ratio(IV w, IV h);
  */
 __device__ double  six_disks_maximize_covered_width(const Variables& vars);
 
-// a placement of two disks and recursion covering a strip at the bottom of the rectangle
 /**
  * @brief Datatype that describes the result of placing two disks such that they cover the
  * bottom side of our rectangle.
  */
-struct Bottom_row_2 {
+/*struct Bottom_row_2 {
 	/// The upper intersection point of the two disks.
 	Point upper_intersection;
 	/// The two disks.
 	Circle c1, c2;
 	/// A lower bound on the height covered on each side.
 	double lb_height_border;
-};
-/**
- * @brief Compute a Bottom_row_2 result from lambda, two disks and 
- * 
- * @param la 
- * @param larger 
- * @param smaller 
- * @param recursion_weight 
- * @return Bottom_row_2  
- */
-//__device__ Bottom_row_2 compute_bottom_row(IV la, IV larger, IV smaller, IV recursion_weight);
+};*/
 
 // compute the range of squared radii for which an efficiency of critical_ratio can be achieved when covering a rectangular substrip of a strip of smaller side length h
 // and longer side length at least lb_w
@@ -246,23 +252,51 @@ __device__ bool   r1_in_corner_wall_building_recursion(const Variables& vars, co
 // cover a strip at the left side using 2x2 disks
 __device__ Two_by_two_cover compute_two_by_two_cover(const IV* disks);
 
-// cover a strip at the left side using 2x2 disks; cover the remaining strip using the two remaining disks and recursion
-__device__ bool  two_by_two_cover_with_strip_and_recursion(const Variables& vars, const Intermediate_values& vals); // Subsection Using the four largest disks
-
 // cover an L-shaped region using explicit disks and recurse on the remaining parts
+
 __device__ bool l_shaped_recursion(const Variables& vars, const Intermediate_values& vals); // Subsection Using the three largest disks
 
-// try full coverage by the five largest disks plus recursion on one region
-__device__ bool five_disk_full_cover(const Variables& vars, const Intermediate_values& vals); // Subsection Using the five largest disks
+// cover a strip at the left side using 2x2 disks; cover the remaining strip using the two remaining disks and recursion
+/**
+ * @brief 
+ * 
+ * @param vars 
+ * @param vals 
+ * @return __device__ 
+ */
+__device__ bool  two_by_two_cover_with_strip_and_recursion(const Variables& vars, const Intermediate_values& vals);
 
-// try full coverage by the six largest disks plus (potentially) recursion on one small region
-__device__ bool six_disk_full_cover(const Variables& vars, const Intermediate_values& vals); // Subsection Using the six largest disks
+/**
+ * @brief Check whether our 5-disk strategies can definitely reach a full cover of the rectangle,
+ *        possibly using recursion with the remaining disks.
+ * 
+ * @param vars The variable values for the given case.
+ * @param vals Intemediate values for the given case.
+ * @return true if we can definitely cover the rectangle using one of our five-disk strategies.
+ */
+__device__ bool five_disk_full_cover(const Variables& vars, const Intermediate_values& vals);
 
-// extend the number of explicitly considered disks to 7 and use different strategies for covering
+/**
+ * @brief Check whether our 6-disk strategies can definitely reach a full cover of the rectangle,
+ *        possibly using recursion with the remaining disks.
+ * 
+ * @param vars The variable values for the given case.
+ * @param vals Intemediate values for the given case.
+ * @return true if we can definitely cover the rectangle using one of our six-disk strategies.
+ */
+__device__ bool six_disk_full_cover(const Variables& vars, const Intermediate_values& vals);
+
+/**
+ * @brief Check whether any of our strategies that consider up to 7 disks explicitly
+ *        can definitely handle the given case.
+ * 
+ * @param vars The variable values (disk radii, lambda, etc).
+ * @param vals Intermediate values based on the variables (remaining weight, etc.)
+ * @return true if we find a seven-disk strategy that definitely works; false otherwise.
+ */
 __device__ bool seven_disk_strategies(const Variables& vars, const Intermediate_values& vals);
 
 }
 }
 
 #endif
-
