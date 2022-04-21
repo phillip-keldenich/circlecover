@@ -20,19 +20,50 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 
+/**
+ * @file algcuda/properties.hpp Utilities to read CUDA device properties.
+ */
+
 #ifndef ALGCUDA_PROPERTIES_HPP_INCLUDED_
 #define ALGCUDA_PROPERTIES_HPP_INCLUDED_
 
 namespace algcuda {
 	namespace device {
+		/**
+		 * @brief A CUDA device ID (int).
+		 */
 		using Id = int;
 
+		/**
+		 * @brief Get the number of CUDA devices.
+		 * @return int 
+		 */
 		int count();
+
+		/**
+		 * @brief Get the current default device.
+		 * @return Id The device ID.
+		 */
 		Id current_default();
+
+		/**
+		 * @brief Get the maximum number of threads that can be started per block for the current default device.
+		 * @return int 
+		 */
 		int max_threads_per_block();
+
+		/**
+		 * @brief Get the maximum number of threads that can be started per block.
+		 * 
+		 * @param id The device to get the result for.
+		 * @return int 
+		 */
 		int max_threads_per_block(device::Id id);
 
-		/// Unlike the methods above, these methods cache their results; only use them once the default device has been set.
+		/**
+		 * @brief Cached version of the functions above.
+		 * Only use once the default device has been (implicitly) set.
+		 */
 		namespace cached {
 			int max_threads_per_block();
 		}
