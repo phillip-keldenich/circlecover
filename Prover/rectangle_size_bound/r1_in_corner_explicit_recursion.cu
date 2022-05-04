@@ -26,11 +26,11 @@ using namespace circlecover;
 using namespace circlecover::rectangle_size_bound;
 
 namespace {
-	struct Backtracking_stack_entry {
-		double reached_height;
-		int used_disks;
-		int current_choice;
-	};
+struct Backtracking_stack_entry {
+	double reached_height;
+	int used_disks;
+	int current_choice;
+};
 }
 
 __device__ static bool r1_in_corner_explicit_recursion_above_nd(const Variables& vars, const Intermediate_values& vals, int nd) {

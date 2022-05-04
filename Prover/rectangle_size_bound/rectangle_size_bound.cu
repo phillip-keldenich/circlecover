@@ -64,35 +64,79 @@ constexpr int num_generations = 1;
 constexpr std::size_t default_output_buffer_size = 1 << 20;
 
 namespace circlecover {
-	namespace rectangle_size_bound {
-		void __host__ find_critical_intervals();
+namespace rectangle_size_bound {
 
-		struct Interval_buffer {
-			__host__ Interval_buffer() :
-				buffer(algcuda::device::make_unique<Variables[]>(default_output_buffer_size)),
-				buffer_size_current(algcuda::device::make_unique<std::size_t>()),
-				buffer_size_total(default_output_buffer_size)
-			{}
+/**
+ * @brief Find critical hyperrectangles for the size-bounded disk case (Lemma 4).
+ */
+void __host__ find_critical_intervals();
 
-			void __host__ enlarge(int new_size) {
-				buffer = algcuda::device::make_unique<Variables[]>(new_size);
-				buffer_size_total = new_size;
-			}
+/**
+ * @brief A buffer for critical hyperrectangles.
+ * Before the actual search for critical hyperractangles in a CUDA kernel call,
+ * the buffer is allocated to some size by the host. If that size is sufficient
+ * to store all found critical hyperrectangles, then one kernel run is enough.
+ * If the buffer turns out to be insufficient, the number of hyperrectangles is
+ * counted, the buffer is grown, so that a second kernel run can report all hyperrectangles.
+ */
+struct Interval_buffer {
+	/**
+	 * @brief Create an interval buffer.
+	 */
+	__host__ Interval_buffer() :
+		buffer(algcuda::device::make_unique<Variables[]>(default_output_buffer_size)),
+		buffer_size_current(algcuda::device::make_unique<std::size_t>()),
+		buffer_size_total(default_output_buffer_size)
+	{}
 
-			algcuda::device::Memory<Variables[]> buffer;
-			algcuda::device::Memory<std::size_t> buffer_size_current;
-			std::size_t buffer_size_total;
-		};
-
-		static void __host__ find_critical_intervals_in(const Variables& intervals, Interval_buffer& buffers, std::vector<Variables>& append_to, bool interruptible, bool is_initialization, unsigned start_from_lambda = 0);
-		static void __host__ find_critical_intervals_in_call_kernel(const Variables& intervals, Interval_buffer& buffers, std::vector<Variables>& append_to, bool is_initialization);
+	/**
+	 * @brief Enlarge/grow the buffer to the given size.
+	 * @param new_size 
+	 */
+	void __host__ enlarge(int new_size) {
+		buffer = algcuda::device::make_unique<Variables[]>(new_size);
+		buffer_size_total = new_size;
 	}
+
+	algcuda::device::Memory<Variables[]> buffer; ///< The memory of the buffer.
+	algcuda::device::Memory<std::size_t> buffer_size_current; ///< The number of elements in the buffer (in device memory).
+	std::size_t buffer_size_total; ///< The total buffer size (capacity).
+};
+
+/**
+ * @brief Find critical hyperrectangles in the hyperrectangle given by intervals, using the given device-buffer,
+ * append them to the given vector (on the host). Optionally, the computation can be interruptible by a SIGINT,
+ * and may start from a lambda value that is not the first lambda-subinterval in the given hyperrectangle;
+ * this is mainly for purposes of finding counterexamples more quickly during the development of the prover/algorithm.
+ * 
+ * @param intervals 
+ * @param buffers 
+ * @param append_to 
+ * @param interruptible 
+ * @param is_initialization 
+ */
+static void __host__ find_critical_intervals_in(const Variables& intervals, Interval_buffer& buffers, std::vector<Variables>& append_to,
+                                                bool interruptible, bool is_initialization);
+
+/**
+ * @brief 
+ * 
+ * @param intervals 
+ * @param buffers 
+ * @param append_to 
+ * @param is_initialization 
+ */
+static void __host__ find_critical_intervals_in_call_kernel(const Variables& intervals, Interval_buffer& buffers,
+                                                            std::vector<Variables>& append_to, bool is_initialization);
+}
 }
 
 using namespace circlecover;
 using namespace circlecover::rectangle_size_bound;
 
-static inline void __device__ push_interval_set_to_buffer(const Variables& vars, Variables* buffer, std::size_t buffer_size, std::size_t* current_size) {
+static inline void __device__ push_interval_set_to_buffer(const Variables& vars, Variables* buffer,
+                                                          std::size_t buffer_size, std::size_t* current_size)
+{
 	static_assert(sizeof(std::size_t) == sizeof(unsigned long long), "Size of unsigned long long is wrong!");
 	std::size_t index = static_cast<std::size_t>(atomicAdd(reinterpret_cast<unsigned long long*>(current_size), 1));
 	if(index < buffer_size) {
@@ -273,12 +317,12 @@ void __host__ circlecover::rectangle_size_bound::find_critical_intervals_in_call
 	}
 }
 
-void __host__ circlecover::rectangle_size_bound::find_critical_intervals_in(const Variables& intervals, Interval_buffer& buffers, std::vector<Variables>& append_to, bool interruptible, bool is_initialization, unsigned start_from_lambda_offset) {
+void __host__ circlecover::rectangle_size_bound::find_critical_intervals_in(const Variables& intervals, Interval_buffer& buffers, std::vector<Variables>& append_to, bool interruptible, bool is_initialization) {
 	const int la_subintervals = is_initialization ? la_subintervals_init : la_subintervals_subdiv;
 	const int r1_subintervals = is_initialization ? r1_subintervals_init : r1_subintervals_subdiv;
 	const int r2_subintervals = is_initialization ? r2_subintervals_init : r2_subintervals_subdiv;
 
-	for(int la_offset = static_cast<int>(start_from_lambda_offset); la_offset < la_subintervals; ++la_offset) {
+	for(int la_offset = 0; la_offset < la_subintervals; ++la_offset) {
 		IV la = get_subinterval(intervals.la, la_offset, la_subintervals);
 		for(int r1_offset = 0; r1_offset < r1_subintervals; ++r1_offset) {
 			IV r1 = get_subinterval(intervals.radii[0], r1_offset, r1_subintervals);
