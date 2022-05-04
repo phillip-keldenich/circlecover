@@ -25,18 +25,18 @@
 #include <cuda_runtime.h>
 
 namespace algcuda {
-	namespace device {
-		void synchronize() {
-			throw_if_cuda_error(cudaDeviceSynchronize(), "Device synchronization failed or asynchronous launch failed");
-		}
+namespace device {
+void synchronize() {
+	throw_if_cuda_error(cudaDeviceSynchronize(), "Device synchronization failed or asynchronous launch failed");
+}
 
-		void synchronize_check_errors() {
-			throw_if_cuda_error(cudaGetLastError(), "Synchronous launch failure!");
-			throw_if_cuda_error(cudaDeviceSynchronize(), "Device synchronization failed or asynchronous launch produced error");
-		}
+void synchronize_check_errors() {
+	throw_if_cuda_error(cudaGetLastError(), "Synchronous launch failure!");
+	throw_if_cuda_error(cudaDeviceSynchronize(), "Device synchronization failed or asynchronous launch produced error");
+}
 
-		void set_printf_buffer_size(std::size_t bytes) {
-			throw_if_cuda_error(cudaDeviceSetLimit(cudaLimitPrintfFifoSize, bytes), "Could not set printf buffer size");
-		}
-	}
+void set_printf_buffer_size(std::size_t bytes) {
+	throw_if_cuda_error(cudaDeviceSetLimit(cudaLimitPrintfFifoSize, bytes), "Could not set printf buffer size");
+}
+}
 }

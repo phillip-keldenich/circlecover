@@ -28,50 +28,51 @@
 #define ALGCUDA_PROPERTIES_HPP_INCLUDED_
 
 namespace algcuda {
-	namespace device {
-		/**
-		 * @brief A CUDA device ID (int).
-		 */
-		using Id = int;
+namespace device {
+/**
+ * @brief A CUDA device ID (int).
+ */
+using Id = int;
 
-		/**
-		 * @brief Get the number of CUDA devices.
-		 * @return int 
-		 */
-		int count();
+/**
+ * @brief Get the number of CUDA devices.
+ * @return int 
+ */
+int count();
 
-		/**
-		 * @brief Get the current default device.
-		 * @return Id The device ID.
-		 */
-		Id current_default();
+/**
+ * @brief Get the current default device.
+ * @return Id The device ID.
+ */
+Id current_default();
 
-		/**
-		 * @brief Get the maximum number of threads that can be started per block for the current default device.
-		 * @return int 
-		 */
-		int max_threads_per_block();
+/**
+ * @brief Get the maximum number of threads that can be started per block for the current default device.
+ * @return int 
+ */
+int max_threads_per_block();
 
-		/**
-		 * @brief Get the maximum number of threads that can be started per block.
-		 * 
-		 * @param id The device to get the result for.
-		 * @return int 
-		 */
-		int max_threads_per_block(device::Id id);
+/**
+ * @brief Get the maximum number of threads that can be started per block.
+ * 
+ * @param id The device to get the result for.
+ * @return int 
+ */
+int max_threads_per_block(device::Id id);
 
-		/**
-		 * @brief Cached version of the functions above.
-		 * Only use once the default device has been (implicitly) set.
-		 */
-		namespace cached {
-			/**
-			 * @brief A cached version of the max_threads_per_block function.
-			 * @return int 
-			 */
-			int max_threads_per_block();
-		}
-	}
+/**
+ * @brief Cached version of the functions above.
+ * Only use once the default device has been (implicitly) set.
+ */
+namespace cached {
+/**
+ * @brief A cached version of the max_threads_per_block function.
+ * @return int 
+ */
+int max_threads_per_block();
+}
+
+}
 }
 
 #endif

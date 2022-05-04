@@ -24,16 +24,18 @@
 #define CIRCLECOVER_RECTANGLE_SIZE_BOUND_VALUES_HPP_INCLUDED_
 
 namespace circlecover {
-	namespace rectangle_size_bound {
-		static const double lb_proof_lambda = 1.0; // the lower bound on lambda
-		static const double ub_proof_lambda = 2.5; // the lambda for up to which we want to prove
+namespace rectangle_size_bound {
 
-		static const double critical_ratio = 0.61; // the double value is less than the actual 0.61
+static const double lb_proof_lambda = 1.0; // the lower bound on lambda
+static const double ub_proof_lambda = 2.5; // the lambda for up to which we want to prove
 
-		// max radius 0.375 / squared radius 0.140625
-		static const double ub_disk_radius = 3.0 / 8.0;  // exactly representable
-		static const double ub_disk_weight = 9.0 / 64.0; // exactly representable
-	}
+static const double critical_ratio = 0.61; // the double value is less than the actual 0.61
+
+// max radius 0.375 / squared radius 0.140625
+static const double ub_disk_radius = 3.0 / 8.0;  // exactly representable
+static const double ub_disk_weight = 9.0 / 64.0; // exactly representable
+
+}
 }
 
 #endif

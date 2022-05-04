@@ -25,35 +25,37 @@
 #include <cuda_runtime.h>
 
 namespace algcuda {
-	namespace device {
-		int count() {
-			int cnt;
-			throw_if_cuda_error(cudaGetDeviceCount(&cnt), "Could not get number of CUDA devices");
-			return cnt;
-		}
+namespace device {
 
-		Id current_default() {
-			int cur;
-			throw_if_cuda_error(cudaGetDevice(&cur), "Could not get the current CUDA default device");
-			return cur;
-		}
+int count() {
+	int cnt;
+	throw_if_cuda_error(cudaGetDeviceCount(&cnt), "Could not get number of CUDA devices");
+	return cnt;
+}
 
-		int max_threads_per_block() {
-			Id dev = current_default();
-			return max_threads_per_block(dev);
-		}
+Id current_default() {
+	int cur;
+	throw_if_cuda_error(cudaGetDevice(&cur), "Could not get the current CUDA default device");
+	return cur;
+}
 
-		namespace cached {
-			int max_threads_per_block() {
-				static const int result = ::algcuda::device::max_threads_per_block();
-				return result;
-			}
-		}
+int max_threads_per_block() {
+	Id dev = current_default();
+	return max_threads_per_block(dev);
+}
 
-		int max_threads_per_block(device::Id id) {
-			cudaDeviceProp props;
-			throw_if_cuda_error(cudaGetDeviceProperties(&props, id), "Could not query device properties");
-			return props.maxThreadsPerBlock;
-		}
+namespace cached {
+	int max_threads_per_block() {
+		static const int result = ::algcuda::device::max_threads_per_block();
+		return result;
 	}
+}
+
+int max_threads_per_block(device::Id id) {
+	cudaDeviceProp props;
+	throw_if_cuda_error(cudaGetDeviceProperties(&props, id), "Could not query device properties");
+	return props.maxThreadsPerBlock;
+}
+
+}
 }

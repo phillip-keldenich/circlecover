@@ -26,22 +26,22 @@
 #include <csignal>
 
 namespace circlecover {
-	/**
-	 * @brief Flag that signalizes that we were interrupted by a signal.
-	 */
-	extern volatile std::sig_atomic_t was_interrupted;
+/**
+ * @brief Flag that signalizes that we were interrupted by a signal.
+ */
+extern volatile std::sig_atomic_t was_interrupted;
 
-	/**
-	 * @brief Start an interruptible computation.
-	 * Sets up a signal handler that sets was_interrupted.
-	 */
-	void start_interruptible_computation();
+/**
+ * @brief Start an interruptible computation.
+ * Sets up a signal handler that sets was_interrupted.
+ */
+void start_interruptible_computation();
 
-	/**
-	 * @brief Stops an interruptible computation.
-	 * Restores the old signal handler after a call to start_interruptible_computation.
-	 */
-	void stop_interruptible_computation();
+/**
+ * @brief Stops an interruptible computation.
+ * Restores the old signal handler after a call to start_interruptible_computation.
+ */
+void stop_interruptible_computation();
 }
 
 #endif

@@ -33,9 +33,9 @@
 #include <algorithm>
 
 namespace circlecover {
-	namespace tight_rectangle {
-		void find_critical_intervals();
-	}
+namespace tight_rectangle {
+void find_critical_intervals();
+}
 }
 
 using namespace circlecover;
@@ -543,4 +543,3 @@ std::ostream& __host__ circlecover::tight_rectangle::operator<<(std::ostream& o,
 	}
 	return o;
 }
-

@@ -28,32 +28,32 @@
 #define ALGCUDA_UTILS_EXIT_CUH_INCLUDED_
 
 namespace algcuda {
-	/**
-	 * @brief Cancel execution of the current kernel with an error.
-	 */
-	inline __device__ void trap() noexcept {
-		__threadfence();
-		asm("trap;\n");
-	}
+/**
+ * @brief Cancel execution of the current kernel with an error.
+ */
+inline __device__ void trap() noexcept {
+	__threadfence();
+	asm("trap;\n");
+}
 
-	/**
-	 * @brief Cancel execution of the current kernel, printing an error message.
-	 * 
-	 * @param expr 
-	 * @param file 
-	 * @param line 
-	 */
-	inline __device__ void assert_trap(const char* expr, const char* file, int line) noexcept {
-		printf("Assertion '%s' (%s:%d) failed!\n", expr, file, line);
-		trap();
-	}
+/**
+ * @brief Cancel execution of the current kernel, printing an error message.
+ * 
+ * @param expr 
+ * @param file 
+ * @param line 
+ */
+inline __device__ void assert_trap(const char* expr, const char* file, int line) noexcept {
+	printf("Assertion '%s' (%s:%d) failed!\n", expr, file, line);
+	trap();
+}
 
-	/**
-	 * @brief Cancel execution of the current kernel without raising an error.
-	 */
-	inline __device__ void exit() noexcept {
-		asm("exit;\n");
-	}
+/**
+ * @brief Cancel execution of the current kernel without raising an error.
+ */
+inline __device__ void exit() noexcept {
+	asm("exit;\n");
+}
 }
 
 #ifdef NDEBUG

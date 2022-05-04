@@ -21,13 +21,13 @@
 //SOFTWARE.
 
 namespace circlecover {
-	namespace rectangle_size_bound {
-		void find_critical_intervals();
-	}
+namespace rectangle_size_bound {
+void find_critical_intervals();
+}
 
-	namespace tight_rectangle {
-		void find_critical_intervals();
-	}
+namespace tight_rectangle {
+void find_critical_intervals();
+}
 }
 
 /**

@@ -26,32 +26,31 @@
 #include <algcuda/interval.hpp>
 
 namespace circlecover {
-	/**
-	 * @brief Get the ith subinterval of n subintervals of the given interval; indices from [0,n).
-	 * The subintervals are (nearly, up to rounding) evenly wide.
-	 * It is guaranteed that the end of interval i is exactly the start of interval i + 1,
-	 * the begin of interval 0 is interval.get_lb(), and the end of the last interval (index n-1)
-	 * is interval.get_ub(); i.e., together, the n subintervals cover the entire interval.
-	 * 
-	 * @tparam NumType 
-	 * @param interval 
-	 * @param i 
-	 * @param n 
-	 * @return algcuda::Interval<NumType> 
-	 */
-	template<typename NumType>
-	inline algcuda::Interval<NumType> __device__ __host__ get_subinterval(algcuda::Interval<NumType> interval, int i, int n) {
-		double lb = interval.get_lb();
-		double ub = interval.get_ub();	
-		double diff = ub - lb;
-		diff /= n;
-		
-		double l = lb + diff * i;
-		double u = lb + diff * (i+1);
-		if(i+1 == n) u = ub;
-		return {l,u};
-	}
+/**
+ * @brief Get the ith subinterval of n subintervals of the given interval; indices from [0,n).
+ * The subintervals are (nearly, up to rounding) evenly wide.
+ * It is guaranteed that the end of interval i is exactly the start of interval i + 1,
+ * the begin of interval 0 is interval.get_lb(), and the end of the last interval (index n-1)
+ * is interval.get_ub(); i.e., together, the n subintervals cover the entire interval.
+ * 
+ * @tparam NumType 
+ * @param interval 
+ * @param i 
+ * @param n 
+ * @return algcuda::Interval<NumType> 
+ */
+template<typename NumType>
+inline algcuda::Interval<NumType> __device__ __host__ get_subinterval(algcuda::Interval<NumType> interval, int i, int n) {
+	double lb = interval.get_lb();
+	double ub = interval.get_ub();	
+	double diff = ub - lb;
+	diff /= n;
+	
+	double l = lb + diff * i;
+	double u = lb + diff * (i+1);
+	if(i+1 == n) u = ub;
+	return {l,u};
+}
 }
 
 #endif
-

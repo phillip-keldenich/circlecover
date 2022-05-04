@@ -32,22 +32,22 @@
 #include <cstdint>
 
 namespace algcuda {
-	namespace device {
-		/**
-		 * @brief Synchronize with the current CUDA device.
-		 */
-		void synchronize();
-		/**
-		 * @brief Synchronize with the current CUDA device, checking for errors.
-		 */
-		void synchronize_check_errors();
+namespace device {
+/**
+ * @brief Synchronize with the current CUDA device.
+ */
+void synchronize();
+/**
+ * @brief Synchronize with the current CUDA device, checking for errors.
+ */
+void synchronize_check_errors();
 
-		/**
-		 * @brief Set the printf buffer size for the current device.
-		 * @param bytes The size, in bytes, of the buffer to set.
-		 */
-		void set_printf_buffer_size(std::size_t bytes);
-	}
+/**
+ * @brief Set the printf buffer size for the current device.
+ * @param bytes The size, in bytes, of the buffer to set.
+ */
+void set_printf_buffer_size(std::size_t bytes);
+}
 }
 
 #endif //ALGCUDA_DEVICE_HPP
