@@ -532,13 +532,6 @@ namespace algcuda {
 		static inline __device__ NumType infty() noexcept;
 	};
 
-#ifdef __CUDACC__
-	static inline __device__ Interval<double> sin(Interval<double> x);
-	static inline __device__ Interval<double> cos(Interval<double> x);
-	static inline __device__ Interval<double> asin(Interval<double> x);
-	static inline __device__ Interval<double> acos(Interval<double> x);
-#endif
-
 	template<typename NumType> static inline __device__ __host__ Uncertain<bool> operator==(NumType nt, const Interval<NumType>& i) noexcept {
 		return i == nt;
 	}
